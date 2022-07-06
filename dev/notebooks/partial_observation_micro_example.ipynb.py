@@ -28,6 +28,9 @@ from larch import P, X
 
 from numpy.random import default_rng
 
+# Just doing this so I can run it in my IDE too
+# def display(*args, **kwargs):
+#     pass
 
 # %%
 def one_based(n):
@@ -75,6 +78,9 @@ display(choice_mapping)
 # %%
 alternatives = list(choice_mapping.values())
 
+# %%
+col_to_nest = {dest + 1: dest + 1000 for dest in range(num_destinations)}
+
 # %% [markdown]
 # ## attractions
 
@@ -108,12 +114,15 @@ display(skims)
 
 # %%
 obs = pd.DataFrame({
-    "caseid": [1, 2, 3],
-    "origin": [1, 2, 2],
-    "partial": [False, False, True],
-    "destination": [1, 2, 1],
-    "chosen": pd.Series([choice_mapping[(1, 2)], choice_mapping[(2, 1)], None], dtype="Int32"),
+    "caseid": [1, 2, 3, 4],
+    "origin": [1, 2, 2, 1],
+    # "partial": [False, False, True, False],
+    # "destination": [1, 2, 1, 1],
+    "chosen": [2, 1001, 1000, 4],
 }).set_index("caseid")
+
+# %%
+obs
 
 # %%
 display(obs)
@@ -137,41 +146,42 @@ tree = lx.DataTree(
 m = lx.Model(datatree=tree)
 m.title = "blah"
 
-m.quantity_ca = P("zero") * X("attractions")
-m.quantity_scale = P.Theta
+# m.quantity_ca = P("zero") * X("attractions")
+# m.quantity_scale = P.Theta
 
 m.utility_ca = P.distance * X.distance
 
 m.choice_co_code = "chosen"
+m.partial_obs = True
 
 # m.availability_var = "attr.attractions > 0"
+# m.partial_co = ("partial", "destination", col_to_nest)
 
-# %%
-for destination in range(num_destinations):
-    m.graph.new_node(parameter='MuDest', children=[choice_mapping[(destination + 1, purpose + 1)] for purpose in range(num_purposes)], name=f"dest_{destination}")
+for destination in range(1, num_destinations + 1):
+    m.graph.new_node(code=col_to_nest[destination], parameter='MuDest', children=[choice_mapping[(destination, purpose)] for purpose in range(1, num_purposes + 1)], name=f"dest_{destination}")
+    
+m.lock_values(
+    MuDest=1,
+    # zero=0,
+    # Theta=1.,
+    #distance=-10.0
+)
+m.set_cap(10)
 
 # %%
 m.graph
 
 # %%
-m.lock_values(
-    MuDest=1,
-    zero=0,
-    Theta=1.,
-    #distance=-10.0
-)
-# m.set_cap(10)
+m._data_arrays.ch
+
+# %%
+# from rich import inspect
+# inspect(m.graph)
+
+# %% [markdown]
+# # Compute the values
 
 # %%
 m.loglike()
-
-# %%
-m.d_loglike()
-
-# %%
-m.work_arrays
-
-# %%
-m.maximize_loglike()
 
 # %%

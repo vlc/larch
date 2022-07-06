@@ -92,7 +92,7 @@ def array_av_cascade(arr_av, graph):
     cascade_or(result.reshape(-1,len(graph)), dns, ups)
     return result
 
-def array_ch_cascade(arr_ch, graph, dtype=None):
+def array_ch_cascade(arr_ch, graph, arr_ch_nest=None, dtype=None):
     """
     Create an extra wide array with choices rolled up to nests.
 
@@ -107,6 +107,9 @@ def array_ch_cascade(arr_ch, graph, dtype=None):
     arr_ch : ndarray
     graph : NestingTree
 
+
+    arr_ch_nest (Optional): ndarray with values for nests 
+
     Returns
     -------
     array
@@ -117,7 +120,14 @@ def array_ch_cascade(arr_ch, graph, dtype=None):
         (*arr_ch.shape[:-1], len(graph)),
         dtype=dtype or arr_ch.dtype,
     )
-    result[... ,:graph.n_elementals()] = arr_ch
+
+    num_alts = graph.n_elementals()
+    result[... , :num_alts] = arr_ch
+
+    if arr_ch_nest is not None:
+        assert result.shape[-1] == num_alts + arr_ch_nest.shape[-1] + 1
+        result[..., num_alts:-1] = arr_ch_nest
+
     ups, dns, _1, _2 = graph.edge_slot_arrays()
     cascade_sum(result.reshape(-1,len(graph)), dns, ups)
     return result

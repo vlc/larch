@@ -706,6 +706,13 @@ class Model(_Model5c):
 			elif self.availability_any:
 				req_data.avail_any = True
 
+			if self.partial_obs:
+				req_data.partial_obs = self.partial_obs
+
+				num_alts = len(self.datatree.coords[self.datatree.ALTID])
+				req_data.partial_obs_nests = list(self.graph.standard_sort[num_alts:-1])
+
+
 			return req_data
 		except:
 			logger.exception("error in required_data")

@@ -235,6 +235,23 @@ def prepare_data(
         for i,a in enumerate(model_dataset.coords[datatree.ALTID]):
             da_ch[:, i] = (choicecodes == a)
         model_dataset = model_dataset.merge(da_ch)
+    if request.get("partial_obs", False) is True:
+        log.debug(f"requested partial_obs")
+        choicecodes = datasource[request['choice_co_code']]
+        nests = request["partial_obs_nests"]
+        da_ch_nest = DataArray(
+            float_dtype(0),
+            dims=[datatree.CASEID, "nestid"],
+            coords={
+                datatree.CASEID: model_dataset.coords[datatree.CASEID],
+                "nestid": nests,
+            },
+            name='ch_nest',
+        )
+        for i,a in enumerate(nests):
+            da_ch_nest[:, i] = (choicecodes == a)
+        model_dataset = model_dataset.merge(da_ch_nest)
+
     if 'choice_co' in request:
         log.debug(f"requested choice_co_vars data: {request['choice_co']}")
         da_ch = DataArray(

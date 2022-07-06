@@ -570,7 +570,8 @@ class _DatasetDC(_GenericFlow):
             wt = np.ones(self.n_cases, dtype=float_dtype)
 
         if 'ch' in self:
-            ch = array_ch_cascade(self['ch'].values, graph, dtype=float_dtype)
+            nest_values = self['ch_nest'].values if 'ch_nest' in self else None
+            ch = array_ch_cascade(self['ch'].values, graph, arr_ch_nest=nest_values, dtype=float_dtype)
         else:
             ch = np.zeros([self.n_cases, len(graph)], dtype=float_dtype)
 
