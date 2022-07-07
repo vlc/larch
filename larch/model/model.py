@@ -119,6 +119,9 @@ class Model(_Model5c):
 	>>> print(m.quantity_ca)
 	P.Param1 * X.Data1 + P.Param2 * X.Data2 + P.Param3 * X('Data3/DataCO4')
 	"""
+	
+	# VLC added this here
+	partial_obs = False
 
 	_graph = NestingTree()
 

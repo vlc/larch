@@ -81,6 +81,9 @@ alternatives = list(choice_mapping.values())
 # %%
 col_to_nest = {dest + 1: dest + 1000 for dest in range(num_destinations)}
 
+# %%
+col_to_nest
+
 # %% [markdown]
 # ## attractions
 
@@ -101,7 +104,7 @@ display(attrs)
 # ## skims
 
 # %%
-skims = np.zeros((num_destinations, num_destinations))
+skims = np.random.random(size=(num_destinations, num_destinations))
 
 # %%
 skims = from_numpy(skims, "distance")
@@ -120,9 +123,6 @@ obs = pd.DataFrame({
     # "destination": [1, 2, 1, 1],
     "chosen": [2, 1001, 1000, 4],
 }).set_index("caseid")
-
-# %%
-obs
 
 # %%
 display(obs)
@@ -172,9 +172,6 @@ m.set_cap(10)
 m.graph
 
 # %%
-m._data_arrays.ch
-
-# %%
 # from rich import inspect
 # inspect(m.graph)
 
@@ -182,6 +179,9 @@ m._data_arrays.ch
 # # Compute the values
 
 # %%
-m.loglike()
+m.d_loglike()
+
+# %%
+m.work_arrays
 
 # %%
