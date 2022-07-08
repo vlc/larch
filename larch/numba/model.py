@@ -445,26 +445,31 @@ def _numba_utility_to_loglike(
             if return_bhhh:
                 bhhh[:] = 0.0
 
+            # get index of the chosen alternative (first non-zero occurrence in array_ch). 
+            # TODO this might not *always* be true - but it will be true for our use case
+            a = -1
+            for i, ch in enumerate(array_ch):
+                if ch > 0:
+                    a = i
+                    break
+
             # d loglike
-            for a in range(n_alts):
-                this_ch = array_ch[a]
-                if this_ch == 0:
-                    continue
-                total_probability_a = probability[a]
-                # if total_probability_a > 0:
-                #     tempvalue = d_probability[a, :] / total_probability_a
-                #     if return_bhhh:
-                #         bhhh += np.outer(tempvalue,tempvalue) * this_ch * array_wt[0]
-                #     d_loglike += tempvalue * array_wt[0]
-                #
-                if total_probability_a > 0:
-                    if total_probability_a < 1e-250:
-                        total_probability_a = 1e-250
-                    tempvalue = d_probability[a, :] * (this_ch / total_probability_a)
-                    dLL_temp = tempvalue / this_ch
-                    d_loglike += tempvalue * array_wt[0]
-                    if return_bhhh:
-                        bhhh += np.outer(dLL_temp,dLL_temp) * this_ch * array_wt[0]
+            this_ch = array_ch[a]
+            total_probability_a = probability[a]
+            # if total_probability_a > 0:
+            #     tempvalue = d_probability[a, :] / total_probability_a
+            #     if return_bhhh:
+            #         bhhh += np.outer(tempvalue,tempvalue) * this_ch * array_wt[0]
+            #     d_loglike += tempvalue * array_wt[0]
+            #
+            if total_probability_a > 0:
+                if total_probability_a < 1e-250:
+                    total_probability_a = 1e-250
+                tempvalue = d_probability[a, :] * (this_ch / total_probability_a)
+                dLL_temp = tempvalue / this_ch
+                d_loglike += tempvalue * array_wt[0]
+                if return_bhhh:
+                    bhhh += np.outer(dLL_temp,dLL_temp) * this_ch * array_wt[0]
 
 
 _master_shape_signature = (

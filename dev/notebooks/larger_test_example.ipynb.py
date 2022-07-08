@@ -148,18 +148,25 @@ if MAKE_PARTIAL:
             name=f"dest_{destination}"
         )
         
-    m.lock_values(MuDest=1.),
-
-m.lock_values(
-    zero=0,
-    Theta=1.,
-    #distance=-10.0
-)
+    m.lock_values(
+        MuDest=1.,
+        zero=0,
+        Theta=1.,
+    ),
+else: 
+    m.lock_values(
+        zero=0,
+        Theta=1.,
+    )
 
 m.set_cap(10)
 
 # %%
+# %%time
 print(f"init ll = {m.loglike()}")
 m.maximize_loglike(maxiter=1000, tol=1e-12, method="slsqp")
+
+# %%
+m.pbounds
 
 # %%
